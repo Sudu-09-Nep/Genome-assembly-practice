@@ -1,0 +1,28 @@
+# Large raw/processed data
+*.fastq
+*.fastq.gz
+*.fq.gz
+*.bam
+*.cram
+reads_qc/
+assemblies/
+quast_analysis/
+polypolish/
+pypolca/
+medaka_run1/
+autocycler_out/
+snippy/
+
+# Outputs/HTML/JSON/Logs
+*.html
+*.json
+*.stderr
+*.log
+
+# Installers/Envs
+Miniconda3-*.sh
+__pycache__/
+
+# OS
+.DS_Store
+
