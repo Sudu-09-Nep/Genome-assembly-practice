@@ -234,7 +234,8 @@ The final assembly used for downstream QUAST, Bakta and Snippy analyses is:
 
 - `pypolca_final/pypolca_final.fasta`
 ```
-## Results (QUAST on final assembly)
+
+ Results (QUAST on final assembly)
 
 The final polished assembly (`pypolca_final/pypolca_final.fasta`) was evaluated with QUAST:
 
@@ -249,4 +250,4 @@ The final polished assembly (`pypolca_final/pypolca_final.fasta`) was evaluated 
 These metrics indicate a near-complete, low-fragmentation bacterial genome with two contigs and no ambiguous bases.
 
 
-Detailed QUAST HTML reports (including Icarus viewers) are available in `quast/quast_results/` (for example, `quast/quast_results/report.html` and `quast/quast_results/icarus.html`) and can be opened locally in a browser after cloning this repository
+Detailed QUAST HTML reports (including Icarus viewers) are available in `quast/quast_results/` (for example, `quast/quast_results/report.html` and `quast/quast_results/icarus.html`) and can be opened locally in a browser after cloning this repository.
