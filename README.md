@@ -16,9 +16,16 @@ Practice hybrid bacterial genome assembly using ONT + Illumina reads, following 
 - Variant calling: `Snippy`.
 
 ## Setup
+
 Create and activate the Conda environment defined in this repository:
 
 ```bash
 conda env create -f environment.yml
 conda activate genome-assembly-mt1881
+## Running the QC workflow
+
+From the repository root (where `scripts/` lives), run:
+
+```bash
+bash scripts/workflow.sh
 
