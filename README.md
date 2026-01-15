@@ -1,27 +1,24 @@
 # Genome assembly practice (Perfect-bacterial-genome-tutorial based)
 
 ## Goal
-Practice hybrid bacterial genome assembly using ONT + Illumina reads, following rrwick/Perfect-bacterial-genome-tutorial with extra tools (Flye, Filtlong, Raven, Autocycler).
+Practice hybrid bacterial genome assembly using ONT + Illumina reads, following rrwick/Perfect-bacterial-genome-tutorial and applying it to an MT1881 isolate.
 
 ## Data
-- Long reads: ont.fastq (subsampled)
-- Short reads: illumina_1.fastq.gz, illumina_2.fastq.gz
-- Raw data source: SSSIHL Depertment of Biosciences AMR lab
+- Long reads: MT_1881.fastq.gz (Nanopore; filtered to `reads_qc/ont.fastq` by this pipeline).
+- Short reads: MT_2025_01881_S75_L001_R1_001.fastq.gz, MT_2025_01881_S75_L001_R2_001.fastq.gz (Illumina; cleaned to `reads_qc/illumina_1.fastq.gz`, `reads_qc/illumina_2.fastq.gz`).
+- Raw data source: SSSIHL Department of Biosciences, AMR lab.
 
-## Tools used at different level
-- Filtlong,fastq 
-- Flye,Raven,Autocycler 
-- Polypolish, Medaka, pypolca
-- QUAST, Bakta, Snippy
+## Tools used
+- Read QC and filtering: `fastp`, `Filtlong`.
+- Long-read assembly: `Flye`, `Raven`, `Autocycler`.
+- Polishing: `Medaka`, `Polypolish`, `pypolca`.
+- Evaluation and annotation: `QUAST`, `Bakta`.
+- Variant calling: `Snippy`.
 
-## Workflow overview
-1. Read QC and subsampling.
-2. Long-read assembly (Flye/Raven/Autocycler).
-3. Polishing with Illumina and ONT.
-4. Assembly evaluation (QUAST) and annotation (Bakta).
-5. Variant calling (Snippy).
+## Setup
 
-## How to reproduce
-- Create Conda env from `environment.yml` (to be added).
-- Run commands in `scripts/` (to be added).
+Create and activate the Conda environment defined in this repository:
 
+```bash
+conda env create -f environment.yml
+conda activate environment name
