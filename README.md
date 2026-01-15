@@ -247,7 +247,44 @@ The final polished assembly (`pypolca_final/pypolca_final.fasta`) was evaluated 
 - L50 / L90: 1
 - N's per 100 kbp: 0
 
-These metrics indicate a near-complete, low-fragmentation bacterial genome with two contigs and no ambiguous bases.
-
-
 Detailed QUAST HTML reports (including Icarus viewers) are available in `quast/quast_results/` (for example, `quast/quast_results/report.html` and `quast/quast_results/icarus.html`) and can be opened locally in a browser after cloning this repository.
+
+
+## Results (Snippy self-mapping)
+
+To assess residual errors after polishing, the final assembly (`pypolca_final/pypolca_final.fasta`) was used as a reference for Illumina self-mapping with Snippy:
+
+```bash
+# Create analysis directory and link inputs
+mkdir -p snippy_selfmap
+cd snippy_selfmap
+ln -sf ../reads_qc/illumina_1.fastq.gz R1.fastq.gz
+ln -sf ../reads_qc/illumina_2.fastq.gz R2.fastq.gz
+ln -sf ../pypolca/pypolca_1/pypolca_corrected.fasta ref.fasta
+
+# Optional: index and quick checks
+samtools faidx ref.fasta
+grep -c "^>" ref.fasta
+grep -v "^>" ref.fasta | wc -c
+
+# Run Snippy
+snippy \
+  --ref ref.fasta \
+  --R1 R1.fastq.gz \
+  --R2 R2.fastq.gz \
+  --outdir results \
+  --cpus 4 \
+  --minqual 20 \
+  --minfrac 0.9 \
+  --mapqual 60 \
+  --basequal 13 2>&1 | tee snippy.run.log
+```
+
+Snippy summary (`results/snps.txt`) for this run:
+
+- Software: Snippy 4.6.0  
+- Reference size: 5,409,086 bp  
+- Total variants: 0
+
+
+
