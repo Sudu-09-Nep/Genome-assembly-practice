@@ -1,0 +1,23 @@
+name: genome-assembly-mt1881
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.11
+  - fastp
+  - filtlong
+  - flye
+  - raven-assembler
+  - autocycler
+  - miniasm
+  - any2fasta
+  - minimap2
+  - samtools
+  - medaka
+  - polypolish
+  - pypolca
+  - quast
+  - bakta
+  - snippy
+
