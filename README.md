@@ -36,14 +36,14 @@ This will:
 - Run `fastp` on the raw Illumina reads and produce `reads_qc/illumina_1.fastq.gz` and `reads_qc/illumina_2.fastq.gz`.
 - Filter the Nanopore reads with `Filtlong` and produce `reads_qc/ont.fastq`.
 
-These three files are the cleaned inputs for the downstream assembly and polishing steps that produced the assemblies and results in the original project directory (`assemblies/`, `autocycler_out/`, `medaka_run1/`, `polypolish/`, `pypolca/`, `quast/`, `quast_analysis/`, `bakta/`, `snippy/`). [page:1]
+These three files are the cleaned inputs for the downstream assembly and polishing steps that produced the assemblies and results in the original project directory (`assemblies/`, `autocycler_out/`, `medaka_run1/`, `polypolish/`, `pypolca/`, `quast/`, `quast_analysis/`, `bakta/`, `snippy/).
 
 ## Autocycler usage
 
 Initially, the full Autocycler wrapper (`autocycler_full.sh`) was attempted but did not complete successfully on this dataset. Instead, assemblies were generated (for example with Raven), and the Autocycler resume script was used to continue from the existing `assemblies/` folder. [page:1]
 
-- `autocycler_full.sh`: full pipeline wrapper (included here for reference; not used in the final successful run). [page:1]
-- `autocycler_resume.sh`: script that was actually used, starting from `assemblies/` and producing the consensus `autocycler_assembly.fasta`, which was then used for downstream polishing. [page:1]
+- `autocycler_full.sh`: full pipeline wrapper (included here for reference; not used in the final successful run).
+- `autocycler_resume.sh`: script that was actually used, starting from `assemblies/` and producing the consensus `autocycler_assembly.fasta`, which was then used for downstream polishing.
 
 ## Polishing steps
 
@@ -54,7 +54,7 @@ After obtaining the long-read consensus assembly from Autocycler, a multi-step p
 Input and output:
 
 - Input: `autocycler_out/consensus_assembly.fasta` + Nanopore reads (`MT_1881.fastq.gz`, mapped as described below). [page:1]
-- Output: `medaka_run1/medaka_polished/consensus.fasta` (long-read–polished assembly, also used under `polypolish/` as `medaka_polished.fasta`). [page:1]
+- Output: `medaka_run1/medaka_polished/consensus.fasta` (long-read–polished assembly, also used under `polypolish/` as `medaka_polished.fasta`).
 
 To polish the Autocycler consensus assembly with Nanopore reads:
 
@@ -145,7 +145,7 @@ So the structure becomes:
 
 - `terminal/polypolish/` – contains `medaka_polypolish.fasta`  
 - `terminal/pypolca/` – contains `polypolish_polished.fasta` (input to PyPolca)  
-- `terminal/reads_qc/` – contains cleaned Illumina reads [page:1]
+- `terminal/reads_qc/` – contains cleaned Illumina reads
 
 ### 3. PyPolca (final short-read polishing)
 
@@ -249,3 +249,4 @@ The final polished assembly (`pypolca_final/pypolca_final.fasta`) was evaluated 
 These metrics indicate a near-complete, low-fragmentation bacterial genome with two contigs and no ambiguous bases.
 
 
+Detailed QUAST HTML reports (including Icarus viewers) are available in `quast/quast_results/` (for example, `quast/quast_results/report.html` and `quast/quast_results/icarus.html`) and can be opened locally in a browser after cloning this repository
