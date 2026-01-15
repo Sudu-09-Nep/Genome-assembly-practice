@@ -36,68 +36,203 @@ This will:
 - Run `fastp` on the raw Illumina reads and produce `reads_qc/illumina_1.fastq.gz` and `reads_qc/illumina_2.fastq.gz`.
 - Filter the Nanopore reads with `Filtlong` and produce `reads_qc/ont.fastq`.
 
-These three files are the cleaned inputs for the downstream assembly and polishing steps that produced the assemblies and results in the original project directory (`assemblies/`, `autocycler_out/`, `medaka_run1/`, `polypolish/`, `pypolca/`, `quast/`, `quast_analysis/`, `bakta/`, `snippy/`).
+These three files are the cleaned inputs for the downstream assembly and polishing steps that produced the assemblies and results in the original project directory (`assemblies/`, `autocycler_out/`, `medaka_run1/`, `polypolish/`, `pypolca/`, `quast/`, `quast_analysis/`, `bakta/`, `snippy/`). [page:1]
 
 ## Autocycler usage
 
-Initially, the full Autocycler wrapper (`autocycler_full.sh`) was attempted but did not complete successfully on this dataset. Instead, assemblies were generated (for example with Raven), and the Autocycler resume script was used to continue from the existing `assemblies/` folder.
+Initially, the full Autocycler wrapper (`autocycler_full.sh`) was attempted but did not complete successfully on this dataset. Instead, assemblies were generated (for example with Raven), and the Autocycler resume script was used to continue from the existing `assemblies/` folder. [page:1]
 
-- `autocycler_full.sh`: full pipeline wrapper (included here for reference; not used in the final successful run).
-- `autocycler_resume.sh`: script that was actually used, starting from `assemblies/` and producing the consensus `autocycler_assembly.fasta`, which was then used for downstream polishing.
+- `autocycler_full.sh`: full pipeline wrapper (included here for reference; not used in the final successful run). [page:1]
+- `autocycler_resume.sh`: script that was actually used, starting from `assemblies/` and producing the consensus `autocycler_assembly.fasta`, which was then used for downstream polishing. [page:1]
 
 ## Polishing steps
 
-After obtaining the long-read consensus assembly from Autocycler, a multi-step polishing strategy was applied:
+After obtaining the long-read consensus assembly from Autocycler, a multi-step polishing strategy was applied. [page:1]
 
-1. **Medaka (ONT-based polishing)**
-   - Input: `autocycler_out/consensus_assembly.fasta` + Nanopore reads (`MT_1881.fastq.gz`, mapped as described below).
-   - Output: `medaka_run1/medaka_polished/consensus.fasta` (long-read–polished assembly, also used under `polypolish/` as `medaka_polished.fasta`).
+### 1. Medaka (ONT-based polishing)
 
-2. **Polypolish (short-read polishing)**
-   - Inputs: `polypolish/medaka_polished.fasta` + cleaned Illumina reads (`reads_qc/illumina_1.fastq.gz`, `reads_qc/illumina_2.fastq.gz`).
-   - Output: `polypolish/polypolish_polished.fasta`.
+Input and output:
 
-3. **pypolca (final short-read polishing)**
-   - Input: `polypolish_polished.fasta`.
-   - Output: `pypolca/pypolca_1/pypolca_corrected.fasta` (final polished assembly used for QUAST, Bakta, and Snippy analysis).
-
-### Long-read polishing with Medaka
+- Input: `autocycler_out/consensus_assembly.fasta` + Nanopore reads (`MT_1881.fastq.gz`, mapped as described below). [page:1]
+- Output: `medaka_run1/medaka_polished/consensus.fasta` (long-read–polished assembly, also used under `polypolish/` as `medaka_polished.fasta`). [page:1]
 
 To polish the Autocycler consensus assembly with Nanopore reads:
 
 1. Set up a working directory:
 
-```bash
-cd ~/Documents/terminal
-mkdir medaka_run1
-cd medaka_run1
-```
+   ```bash
+   cd ~/Documents/terminal
+   mkdir medaka_run1
+   cd medaka_run1
+   ```
 
 2. Map Nanopore reads to the Autocycler consensus and create a sorted BAM:
 
-```bash
-minimap2 -ax map-ont -t 4 \
-  ../autocycler_out/consensus_assembly.fasta \
-  ../MT_1881.fastq.gz | \
-  samtools sort -o ont_aligned.bam -
+   ```bash
+   minimap2 -ax map-ont -t 4 \
+     ../autocycler_out/consensus_assembly.fasta \
+     ../MT_1881.fastq.gz | \
+     samtools sort -o ont_aligned.bam -
 
-samtools index ont_aligned.bam
-```
+   samtools index ont_aligned.bam
+   ```
 
 3. Run Medaka polishing (choose a model appropriate for your basecalling):
 
-```bash
-medaka_consensus \
-  -i ont_aligned.bam \
-  -d ../autocycler_out/consensus_assembly.fasta \
-  -o medaka_polished \
-  -m r1041_e82_400bps_sup_g632 \
-  -t 4
-```
+   ```bash
+   medaka_consensus \
+     -i ont_aligned.bam \
+     -d ../autocycler_out/consensus_assembly.fasta \
+     -o medaka_polished \
+     -m r1041_e82_400bps_sup_g632 \
+     -t 4
+   ```
 
 This produces a long-read–polished assembly at:
 
 - `medaka_polished/consensus.fasta`
+
+### 2. Polypolish (short-read polishing)
+
+From the `polypolish` directory:
+
+```bash
+cd ~/Documents/terminal/polypolish
+ls -lh medaka_polished.fasta
+```
+
+Run BWA-MEM alignments for R1 and R2:
+
+```bash
+time bwa mem -t 4 -a medaka_polished.fasta ../reads_qc/illumina_1.fastq.gz > alignments_1.sam
+
+time bwa mem -t 4 -a medaka_polished.fasta ../reads_qc/illumina_2.fastq.gz > alignments_2.sam
+```
+
+Filter alignments for Polypolish:
+
+```bash
+time polypolish filter \
+  --in1 alignments_1.sam --in2 alignments_2.sam \
+  --out1 filtered_1.sam --out2 filtered_2.sam
+```
+
+Run Polypolish:
+
+```bash
+time polypolish polish medaka_polished.fasta \
+  filtered_1.sam filtered_2.sam > medaka_polypolish.fasta
+
+ls -lh medaka_polished.fasta medaka_polypolish.fasta
+```
+
+This produces `medaka_polypolish.fasta` (~5.2 Mb), the Illumina-polished assembly used as input for the final pypolca polishing step.  
+
+For clarity, the Polypolish output was renamed when preparing PyPolca:
+
+```bash
+cd ~/Documents/terminal
+mkdir -p pypolca
+cd pypolca
+
+cp ../polypolish/medaka_polypolish.fasta .
+mv medaka_polypolish.fasta polypolish_polished.fasta
+
+ls -la polypolish_polished.fasta
+```
+
+So the structure becomes:
+
+- `terminal/polypolish/` – contains `medaka_polypolish.fasta`  
+- `terminal/pypolca/` – contains `polypolish_polished.fasta` (input to PyPolca)  
+- `terminal/reads_qc/` – contains cleaned Illumina reads [page:1]
+
+### 3. PyPolca (final short-read polishing)
+
+A separate environment was created for PyPolca:
+
+```bash
+conda create -n pypolca_env -c bioconda -c conda-forge pypolca
+conda activate pypolca_env
+```
+
+#### Index assembly for PyPolca
+
+From `terminal/pypolca`:
+
+```bash
+cd ~/Documents/terminal/pypolca
+
+bwa index polypolish_polished.fasta
+ls -la *.bwt  # Confirm indexing
+```
+
+Expected:
+
+- `polypolish_polished.fasta`  
+- `polypolish_polished.fasta.bwt` (and other BWA index files)
+
+#### BWA-MEM alignment for PyPolca
+
+PyPolca uses primary alignments only (no `-a`):
+
+```bash
+time bwa mem -t 8 -T 50 polypolish_polished.fasta \
+  ~/Documents/terminal/reads_qc/illumina_1.fastq.gz \
+  ~/Documents/terminal/reads_qc/illumina_2.fastq.gz | \
+samtools sort -o pypolca.bam - && samtools index pypolca.bam
+```
+
+Expected outputs:
+
+- `pypolca.bam`  
+- `pypolca.bam.bai`
+
+Check alignment stats:
+
+```bash
+samtools flagstat pypolca.bam  # >95% mapped expected
+```
+
+In this run, mapping was ~99.9% and properly paired ~99.8%, indicating excellent coverage for polishing.
+
+#### PyPolca polishing – two iterations
+
+PyPolca is driven with the `run` subcommand:
+
+**First iteration:**
+
+```bash
+pypolca run -a polypolish_polished.fasta \
+  -1 ~/Documents/terminal/reads_qc/illumina_1.fastq.gz \
+  -2 ~/Documents/terminal/reads_qc/illumina_2.fastq.gz \
+  -t 4 -o pypolca_1
+```
+
+Expected:
+
+- `pypolca_1/pypolca_1.fasta` – first PyPolca-polished assembly  
+- `pypolca_1/pypolca_1.log` – run statistics
+
+**Second iteration:**
+
+```bash
+pypolca run -a pypolca_1/pypolca_1.fasta \
+  -1 ~/Documents/terminal/reads_qc/illumina_1.fastq.gz \
+  -2 ~/Documents/terminal/reads_qc/illumina_2.fastq.gz \
+  -t 4 -o pypolca_final
+```
+
+Final outputs:
+
+```bash
+ls -la pypolca_1/*.fasta pypolca_final/*.fasta
+echo "COMPLETE PIPELINE: Autocycler → Medaka → Polypolish → PyPolca"
+```
+
+The final assembly used for downstream QUAST, Bakta and Snippy analyses is:
+
+- `pypolca_final/pypolca_final.fasta`
 ```
 
 
