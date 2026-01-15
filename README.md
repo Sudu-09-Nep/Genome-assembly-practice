@@ -234,5 +234,18 @@ The final assembly used for downstream QUAST, Bakta and Snippy analyses is:
 
 - `pypolca_final/pypolca_final.fasta`
 ```
+## Results (QUAST on final assembly)
+
+The final polished assembly (`pypolca_final/pypolca_final.fasta`) was evaluated with QUAST:
+
+- Total contigs (≥ 500 bp): 2
+- Total length: 5,409,086 bp
+- Largest contig: 5,291,975 bp
+- N50 / N90: 5,291,975 bp
+- GC content: 50.36%
+- L50 / L90: 1
+- N's per 100 kbp: 0
+
+These metrics indicate a near-complete, low-fragmentation bacterial genome with two contigs and no ambiguous bases.
 
 
