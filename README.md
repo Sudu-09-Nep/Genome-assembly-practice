@@ -1,3 +1,11 @@
+> ## Note  
+> This repo is mainly **practice work** from when I was first exploring bacterial genome assembly and trying out different tools and commands.  
+>  
+> I’ve now moved the properly cleaned‑up and documented hybrid ONT/Illumina workflow here:  
+> **New main repo:** https://github.com/Sudu-09-Nep/ont-illumina-hybrid-assembly [github](https://github.com/ablab/quast)
+>  
+> Feel free to look around here, but for anything serious, please use the new repo.
+
 # Genome assembly practice (Perfect-bacterial-genome-tutorial based)
 
 ## Goal
